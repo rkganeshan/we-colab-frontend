@@ -1,50 +1,83 @@
-# React + TypeScript + Vite
+## WE COLAB
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Steps to run this project locally.
+Assumption: Node 16 or higher is a pre-requisite. Visit https://nodejs.org/en to get the package.
 
-Currently, two official plugins are available:
+1. Clone the repository:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+   ```bash
+   git clone https://github.com/rkganeshan/we-colab-frontend.git
+   cd we-colab-frontend
+   ```
 
-## Expanding the ESLint configuration
+2. Install dependencies:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+   ```bash
+   npm install
+   ```
 
-- Configure the top-level `parserOptions` property like this:
+   or if using Yarn:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+   ```bash
+   yarn install
+   ```
+
+## Environment Variables
+
+Add your environment variables in a `.env` file at the root of the project. Example:
+
+```env
+VITE_APP_MODE="prod"
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+OR
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```env
+VITE_APP_MODE="local"
 ```
+
+If you point to local you need to run the server locally.
+To setup the same you can visit : https://github.com/rkganeshan/we-colab-backend , and set it up from there.
+
+## Usage
+
+### Development
+
+Run the development server:
+
+```bash
+npm run dev
+```
+
+or with Yarn:
+
+```bash
+yarn dev
+```
+
+### Build
+
+Build the project for production:
+
+```bash
+npm run build
+```
+
+or with Yarn:
+
+```bash
+yarn build
+```
+
+## Scripts
+
+Here is a list of common scripts for this project:
+
+- `dev`: Starts the development server at port 5173.
+- `build`: Builds the project for production.
+
+## Assumptions made:
+
+1. Eraser related code has been commented out, as eraser is currently not implemented for shapes.
+
+2. The backend has been deployed on Render in a free tier, and since the app uses socket, there are chances that the backend service may go down.
