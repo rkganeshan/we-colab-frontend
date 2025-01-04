@@ -197,24 +197,47 @@ const Whiteboard: React.FC = () => {
 
       const updatedElements = elements.filter((element) => {
         if ("type" in element) {
-          return true;
+          if (element.type === "rectangle") {
+            const { x, y, width, height } = element as DrawShape;
+            return !(
+              offsetX >= x &&
+              offsetX <= x + width &&
+              offsetY >= y &&
+              offsetY <= y + height
+            );
+          } else if (element.type === "circle") {
+            const { x, y, width } = element as DrawShape;
+            const radius = width / 2;
+            const distToCenter = Math.sqrt(
+              (offsetX - x) ** 2 + (offsetY - y) ** 2
+            );
+            return distToCenter > radius;
+          }
+        } else {
+          const line = element as DrawLine;
+          const distToPoint = (
+            x: number,
+            y: number,
+            px: number,
+            py: number
+          ) => {
+            return Math.sqrt((x - px) ** 2 + (y - py) ** 2);
+          };
+
+          const dist1 = distToPoint(line.x0, line.y0, offsetX, offsetY);
+          const dist2 = distToPoint(line.x1, line.y1, offsetX, offsetY);
+
+          const lineLen = Math.sqrt(
+            (line.x0 - line.x1) ** 2 + (line.y0 - line.y1) ** 2
+          );
+          const buffer = 2; // Buffer to consider point on line
+
+          return !(
+            dist1 + dist2 >= lineLen - buffer &&
+            dist1 + dist2 <= lineLen + buffer
+          );
         }
-        const line = element as DrawLine;
-        const distToPoint = (x: number, y: number, px: number, py: number) => {
-          return Math.sqrt((x - px) ** 2 + (y - py) ** 2);
-        };
-
-        const dist1 = distToPoint(line.x0, line.y0, offsetX, offsetY);
-        const dist2 = distToPoint(line.x1, line.y1, offsetX, offsetY);
-
-        const lineLen = Math.sqrt(
-          (line.x0 - line.x1) ** 2 + (line.y0 - line.y1) ** 2
-        );
-        const buffer = 2; // Buffer to consider point on line
-
-        return !(
-          dist1 + dist2 >= lineLen - buffer && dist1 + dist2 <= lineLen + buffer
-        );
+        return true;
       });
 
       setElements(updatedElements);
