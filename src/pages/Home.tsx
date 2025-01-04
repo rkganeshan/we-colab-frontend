@@ -14,6 +14,7 @@ import {
   Grid,
 } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
+import { loadSession } from "../services/socketService";
 import Sessions from "./Sessions";
 
 const Home: React.FC = () => {
@@ -27,9 +28,19 @@ const Home: React.FC = () => {
     navigate(`/whiteboard/${newRoomId}`);
   };
 
-  const handleJoinRoom = () => {
+  const handleJoinRoom = async () => {
     if (roomId) {
-      navigate(`/whiteboard/${roomId}`);
+      try {
+        const response = await loadSession(roomId, "join");
+
+        if (response && response.success) {
+          navigate(`/whiteboard/${roomId}`);
+        } else {
+          alert("No such room exists.");
+        }
+      } catch (error) {
+        alert("Error checking room. Please try again.");
+      }
     }
   };
 

@@ -12,7 +12,7 @@ export const connectSocket = (roomId: string) => {
 
 export const getSocket = () => socket;
 
-export const saveSession = async (roomId:string, drawData:any) => {
+export const saveSession = async (roomId: string, drawData: any) => {
   const token = localStorage.getItem('token');
   
   try {
@@ -28,15 +28,17 @@ export const saveSession = async (roomId:string, drawData:any) => {
   }
 };
 
-export const loadSession = async (roomId: string) => {
+export const loadSession = async (roomId: string, mode?: string) => {
   try {
     const token = localStorage.getItem('token');
     const response = await axios.get(`${config.API_BASE_URL}/api/whiteboard/session/${roomId}`, {
       headers: { Authorization: `Bearer ${token}` },
+      params: { mode },
     });
     return response.data;
   } catch (error) {
     console.error('Error loading session:', error);
+    return { success: false, error: (error as AxiosError).message };
   }
 };
 

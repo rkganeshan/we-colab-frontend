@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { List, ListItem, ListItemText } from "@mui/material";
+import { List, ListItem, ListItemText, Typography } from "@mui/material";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 import { loadUserSessions } from "../services/socketService";
@@ -50,6 +50,18 @@ const Sessions: React.FC = () => {
   const handleSessionClick = (roomId: string) => {
     navigate(`/whiteboard/${roomId}`);
   };
+  if (sessions.length === 0) {
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "24px",
+        }}
+      >
+        <Typography>No boards found.</Typography>
+      </div>
+    );
+  }
 
   return (
     <List
