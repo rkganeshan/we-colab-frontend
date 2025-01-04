@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Container,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import { List, ListItem, ListItemText } from "@mui/material";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
-import { loadUserSessions } from "../services/socketService"; // Import the function
+import { loadUserSessions } from "../services/socketService";
 import { AxiosError } from "axios";
 
 interface Session {
@@ -58,25 +52,33 @@ const Sessions: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" style={{ marginTop: "50px" }}>
-      <Typography variant="h4" gutterBottom align="center">
-        Your Sessions
-      </Typography>
-      <List>
-        {sessions.map((session) => (
-          <ListItem
-            key={session.roomId}
-            onClick={() => handleSessionClick(session.roomId)}
-            component="li"
-          >
-            <ListItemText
-              primary={`Room: ${session.roomId}`}
-              secondary={`Created At: ${session.createdAt}`}
-            />
-          </ListItem>
-        ))}
-      </List>
-    </Container>
+    <List
+      sx={{
+        overflowY: "auto",
+        maxHeight: "65vh",
+        padding: "8px",
+      }}
+    >
+      {sessions.map((session) => (
+        <ListItem
+          key={session.roomId}
+          onClick={() => handleSessionClick(session.roomId)}
+          component="li"
+          sx={{
+            border: "1px solid black",
+            borderRadius: "8px",
+            padding: "2",
+            cursor: "pointer",
+            marginTop: "4px",
+          }}
+        >
+          <ListItemText
+            primary={`Room: ${session.roomId}`}
+            secondary={`Created At: ${session.createdAt}`}
+          />
+        </ListItem>
+      ))}
+    </List>
   );
 };
 
