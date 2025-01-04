@@ -137,7 +137,7 @@ const Login: React.FC = () => {
               Login
             </Button>
             <Typography variant="body2" style={{ color: "white" }}>
-              Don't have an account?{" "}
+              Don't have an account?&nbsp;
               <Link
                 onClick={() => navigate("/register")}
                 style={{
