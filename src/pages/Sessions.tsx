@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { List, ListItem, ListItemText, Typography } from "@mui/material";
+import { Chip, List, ListItem, ListItemText, Typography } from "@mui/material";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../context/AuthContext";
 import { loadUserSessions } from "../services/socketService";
 import { AxiosError } from "axios";
+import { formatDateTime } from "../utils";
 
 interface Session {
   roomId: string;
@@ -86,7 +87,13 @@ const Sessions: React.FC = () => {
         >
           <ListItemText
             primary={`Room: ${session.roomId}`}
-            secondary={`Created At: ${session.createdAt}`}
+            secondary={
+              <Chip
+                label={`Created At: ${formatDateTime(session.createdAt)}`}
+                color="success"
+                size="small"
+              />
+            }
           />
         </ListItem>
       ))}
