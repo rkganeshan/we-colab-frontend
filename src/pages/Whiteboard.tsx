@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   connectSocket,
   getSocket,
@@ -18,6 +18,8 @@ import {
   SelectChangeEvent,
   InputLabel,
   FormControl,
+  Avatar,
+  Menu,
 } from "@mui/material";
 import { jwtDecode } from "jwt-decode";
 import { SketchPicker } from "react-color";
@@ -48,6 +50,7 @@ interface JwtPayload {
 }
 
 const Whiteboard: React.FC = () => {
+  const navigate = useNavigate();
   const { roomId } = useParams<{ roomId: string }>();
   const [elements, setElements] = useState<DrawElement[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -56,6 +59,7 @@ const Whiteboard: React.FC = () => {
   const [tool, setTool] = useState("pencil");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { logout } = useAuth();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const token = localStorage.getItem("token");
   let userId: number | null = null;
@@ -284,6 +288,14 @@ const Whiteboard: React.FC = () => {
     setTool(event.target.value);
   };
 
+  const handleProfileMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   const getEventOffset = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
@@ -336,72 +348,126 @@ const Whiteboard: React.FC = () => {
 
   return (
     <Container>
+      {/* Avatar & Menu */}
+      <Box
+        position="absolute"
+        top={16}
+        right={16}
+        onClick={handleProfileMenuClick}
+        style={{ cursor: "pointer" }}
+      >
+        <Avatar src="/static/images/avatar/1.jpg" />
+      </Box>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleProfileMenuClose}
+      >
+        <MenuItem
+          onClick={() => {
+            navigate("/");
+            handleProfileMenuClose();
+          }}
+        >
+          Home
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            logout();
+            handleProfileMenuClose();
+          }}
+        >
+          Logout
+        </MenuItem>
+      </Menu>
       <Box
         display="flex"
         flexDirection="column"
         alignItems="center"
         marginTop={2}
+        sx={{
+          width: "100%",
+          marginTop: "80px !important",
+        }}
       >
-        <Button
-          variant="contained"
-          color="info"
-          onClick={logout}
-          style={{ marginBottom: "10px" }}
+        <Box
+          display="flex"
+          flexWrap={"wrap"}
+          alignItems="center"
+          justifyContent="flex-start"
+          width="100%"
+          marginBottom={2}
+          gap={1}
         >
-          Logout
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleSaveSession}
-          style={{ marginBottom: "10px" }}
-        >
-          Save Session
-        </Button>
-        <Box position="relative" display="inline-block">
+          <FormControl
+            variant="outlined"
+            style={{
+              marginRight: "10px",
+              width: "200px",
+            }}
+          >
+            <InputLabel>Tool</InputLabel>
+            <Select value={tool} onChange={handleToolChange}>
+              <MenuItem value="pencil">Pencil</MenuItem>
+              <MenuItem value="line">Line</MenuItem>
+              <MenuItem value="rectangle">Rectangle</MenuItem>
+              <MenuItem value="circle">Circle</MenuItem>
+              {/* <MenuItem value="eraser">Eraser</MenuItem> */}
+            </Select>
+          </FormControl>
+
+          <Box position="relative" display="inline-block" marginRight="10px">
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => setShowColorPicker(!showColorPicker)}
+            >
+              Choose Color
+            </Button>
+            {showColorPicker && (
+              <Box position="absolute" zIndex={2} top="100%" left="0">
+                <SketchPicker
+                  color={color}
+                  onChangeComplete={handleColorChange}
+                />
+              </Box>
+            )}
+          </Box>
+
           <Button
             variant="contained"
-            color="secondary"
-            onClick={() => setShowColorPicker(!showColorPicker)}
-            style={{ marginBottom: "10px" }}
+            color="primary"
+            onClick={handleSaveSession}
           >
-            Choose Color
+            Save Session
           </Button>
-          {showColorPicker && (
-            <Box position="absolute" zIndex={2} top="100%" left="0">
-              <SketchPicker
-                color={color}
-                onChangeComplete={handleColorChange}
-              />
-            </Box>
-          )}
         </Box>
-        <FormControl style={{ marginBottom: "10px", width: "200px" }}>
-          <InputLabel>Tool</InputLabel>
-          <Select value={tool} onChange={handleToolChange}>
-            <MenuItem value="pencil">Pencil</MenuItem>
-            <MenuItem value="line">Line</MenuItem>
-            <MenuItem value="rectangle">Rectangle</MenuItem>
-            <MenuItem value="circle">Circle</MenuItem>
-            <MenuItem value="eraser">Eraser</MenuItem>
-          </Select>
-        </FormControl>
+        <Box
+          sx={{
+            maxWidth: "100%",
+            overflowX: "auto",
+          }}
+        >
+          <canvas
+            ref={canvasRef}
+            width={window.innerWidth}
+            height={window.innerHeight}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onTouchStart={handleMouseDown}
+            onTouchMove={handleMouseMove}
+            onTouchEnd={handleMouseUp}
+            style={{
+              border: "1px solid black",
+              cursor: tool === "eraser" ? "cell" : "default",
+              // maxWidth: "100%",
+              height: "auto",
+              backgroundColor: "white",
+            }}
+          />
+        </Box>
       </Box>
-      <canvas
-        ref={canvasRef}
-        width={window.innerWidth}
-        height={window.innerHeight}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onTouchStart={handleMouseDown}
-        onTouchMove={handleMouseMove}
-        onTouchEnd={handleMouseUp}
-        style={{
-          border: "1px solid black",
-          cursor: tool === "eraser" ? "cell" : "default",
-        }}
-      />
     </Container>
   );
 };

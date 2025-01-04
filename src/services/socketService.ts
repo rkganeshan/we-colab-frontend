@@ -1,5 +1,6 @@
+import { AxiosError } from 'axios';
 import { io, Socket } from 'socket.io-client';
-import axios, { AxiosError } from 'axios';
+import axiosInstance from './axiosInstance';
 import config from '../config';
 
 let socket: Socket;
@@ -13,12 +14,10 @@ export const connectSocket = (roomId: string) => {
 export const getSocket = () => socket;
 
 export const saveSession = async (roomId: string, drawData: any) => {
-  const token = localStorage.getItem('token');
-  
   try {
-    const response = await axios.post(`${config.API_BASE_URL}/api/whiteboard/save`, { roomId, drawData }, {
+    const response = await axiosInstance.post('/api/whiteboard/save', { roomId, drawData }, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
     return response.data;
@@ -30,9 +29,10 @@ export const saveSession = async (roomId: string, drawData: any) => {
 
 export const loadSession = async (roomId: string, mode?: string) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${config.API_BASE_URL}/api/whiteboard/session/${roomId}`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await axiosInstance.get(`/api/whiteboard/session/${roomId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      },
       params: { mode },
     });
     return response.data;
@@ -42,13 +42,11 @@ export const loadSession = async (roomId: string, mode?: string) => {
   }
 };
 
-
 export const joinSession = async (userId: number, sessionId: number) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.post(`${config.API_BASE_URL}/api/whiteboard/join`, { userId, sessionId },{
+    const response = await axiosInstance.post('/api/whiteboard/join', { userId, sessionId }, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
     return response.data;
@@ -59,10 +57,9 @@ export const joinSession = async (userId: number, sessionId: number) => {
 
 export const loadUserSessions = async (userId: number) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${config.API_BASE_URL}/api/whiteboard/sessions/${userId}`,{
+    const response = await axiosInstance.get(`/api/whiteboard/sessions/${userId}`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
     return response.data;
