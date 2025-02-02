@@ -10,6 +10,7 @@ import {
   Grid,
   useMediaQuery,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -19,6 +20,7 @@ import { useTypewriter } from "../hooks/useTypewriter";
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -26,6 +28,7 @@ const Login: React.FC = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const response = await axios.post(
         `${config.API_BASE_URL}/api/auth/login`,
@@ -39,6 +42,8 @@ const Login: React.FC = () => {
     } catch (error) {
       console.error("Login error:", error);
       alert("Login error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -133,8 +138,19 @@ const Login: React.FC = () => {
                 fontWeight: "bold",
               }}
               onClick={handleLogin}
+              disabled={loading}
             >
-              Login
+              {loading ? (
+                <>
+                  <CircularProgress
+                    size={20}
+                    style={{ color: "white", marginRight: "8px" }}
+                  />
+                  Loading...
+                </>
+              ) : (
+                "Login"
+              )}
             </Button>
             <Typography variant="body2" style={{ color: "white" }}>
               Don't have an account?&nbsp;

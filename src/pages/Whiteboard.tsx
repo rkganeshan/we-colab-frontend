@@ -12,6 +12,7 @@ import { useAuth } from "../context/AuthContext";
 import {
   Button,
   Container,
+  CircularProgress,
   Box,
   MenuItem,
   Select,
@@ -60,6 +61,7 @@ const Whiteboard: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [saving, setSaving] = useState(false);
 
   const token = localStorage.getItem("token");
   let userId: number | null = null;
@@ -271,11 +273,14 @@ const Whiteboard: React.FC = () => {
   };
 
   const handleSaveSession = async () => {
+    setSaving(true);
     const response = await saveSession(roomId!, elements);
     if (response && response.success) {
       alert("Session saved successfully!");
+      setSaving(false);
     } else {
       alert("Error saving session.");
+      setSaving(false);
     }
   };
 
@@ -317,6 +322,20 @@ const Whiteboard: React.FC = () => {
     }
 
     return { offsetX, offsetY };
+  };
+
+  const handleCopyToClipboard = () => {
+    if (roomId) {
+      navigator.clipboard
+        .writeText(roomId)
+        .then(() => {
+          alert(`Room ID : ${roomId} copied to clipboard!`);
+        })
+        .catch((err) => {
+          console.error("Failed to copy: ", err);
+          alert("Failed to copy Room ID.");
+        });
+    }
   };
 
   useEffect(() => {
@@ -380,6 +399,26 @@ const Whiteboard: React.FC = () => {
           Logout
         </MenuItem>
       </Menu>
+      {/* Back to Home and Copy Room ID Buttons */}
+      <Box>
+        {/* Buttons for navigation and copy */} {" "}
+        <Box display="flex" gap={2} marginBottom={2}>
+          <Button
+            color="info"
+            variant="contained"
+            onClick={() => navigate("/")}
+          >
+            Back to Home
+          </Button>
+          <Button
+            color="warning"
+            variant="contained"
+            onClick={handleCopyToClipboard}
+          >
+            Copy Room ID
+          </Button>
+        </Box>
+      </Box>
       <Box
         display="flex"
         flexDirection="column"
@@ -387,7 +426,7 @@ const Whiteboard: React.FC = () => {
         marginTop={2}
         sx={{
           width: "100%",
-          marginTop: "80px !important",
+          marginTop: "40px !important",
         }}
       >
         <Box
@@ -438,8 +477,19 @@ const Whiteboard: React.FC = () => {
             variant="contained"
             color="primary"
             onClick={handleSaveSession}
+            disabled={saving}
           >
-            Save Session
+            {saving ? (
+              <>
+                <CircularProgress
+                  size={20}
+                  style={{ color: "white", marginRight: "8px" }}
+                />
+                Saving...
+              </>
+            ) : (
+              "Save Session"
+            )}
           </Button>
         </Box>
         <Box
