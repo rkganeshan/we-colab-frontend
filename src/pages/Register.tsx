@@ -10,6 +10,7 @@ import {
   Grid,
   useMediaQuery,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import config from "../config";
@@ -18,6 +19,7 @@ import { useTypewriter } from "../hooks/useTypewriter";
 const Register: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const theme = useTheme();
@@ -30,6 +32,7 @@ const Register: React.FC = () => {
   );
 
   const handleRegister = async () => {
+    setLoading(true);
     try {
       const response = await axios.post(
         `${config.API_BASE_URL}/api/auth/register`,
@@ -43,6 +46,8 @@ const Register: React.FC = () => {
     } catch (error) {
       console.error("Registration error:", error);
       alert("Registration error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,8 +136,20 @@ const Register: React.FC = () => {
                 fontWeight: "bold",
               }}
               onClick={handleRegister}
+              disabled={loading}
             >
-              Register
+              {loading ? (
+                <>
+                  <CircularProgress
+                    size={20}
+                    color="inherit"
+                    style={{ marginRight: 10 }}
+                  />
+                  Loading...
+                </>
+              ) : (
+                "Register"
+              )}
             </Button>
             <Typography variant="body2" style={{ color: "white" }}>
               Already have an account?&nbsp;
